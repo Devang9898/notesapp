@@ -1,66 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📝 NoteKeeper App - Laravel 12
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple yet powerful NoteKeeper application built with **Laravel 12**. This app allows users to **create, manage, search, and bookmark** notes. Authentication is implemented to ensure notes are **user-specific** and secure.
 
-## About Laravel
+## 🚀 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 🔐 **User Authentication** (Login/Register) via personal access token
+- 📝 **CRUD Operations** for Notes (Create, Read, Update, Delete)
+- 📌 **Bookmark Notes** to pin important ones
+- 🔎 **Search Functionality** to find notes easily
+- 🎨 Clean and simple UI with Blade templates
+- 🧩 Built on Laravel 11 with modern practices
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🏗️ Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Framework**: Laravel 11 (PHP 8.2)
+- **Authentication**: Laravel Breeze
+- **Database**: MySQL
+- **Templating**: Blade
+- **Styling**: Tailwind CSS
 
-## Learning Laravel
+## 📸 Screenshots
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+> Add screenshots here (e.g., login screen, note list, create note, bookmark view, search results)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🔐 Login Page
+![Login](public/images/login.png)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Laravel Sponsors
+### 👤 Register Page
+![Register](public/images/register.png)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 📋 Notes Dashboard
+![Dashboard](public/images/dashboard.png)
 
-### Premium Partners
+### 📊 Dashboards View
+![Dashboards](public/images/dashboards.png)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
 
-## Contributing
+### 📝 Create Note Page
+![Create Note](public/images/createnote.png)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 👁️ View Note Page
+![View Note](public/images/view.png)
 
-## Code of Conduct
+### 🔍 Search Results
+![Search](public/images/search.png)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 📌 Bookmarked Notes
+![Bookmarked](public/images/bookmarked.png)
 
-## Security Vulnerabilities
+## 🛠️ Installation
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Clone the repository:
 
-## License
+   ```bash
+   git clone https://github.com/your-username/notekeeper-app.git
+   cd notekeeper-app
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. Install dependencies:
+
+   ```bash
+   composer install
+   npm install && npm run dev
+   ```
+
+3. Copy `.env` and set up your environment:
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Configure your `.env` file with your database credentials:
+
+   ```env
+   DB_DATABASE=your_db_name
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+5. Run migrations:
+
+   ```bash
+   php artisan migrate
+   ```
+
+6. Install and run Laravel Passport:
+
+  ### Step 1: Install Laravel Passport
+
+1. **Install Laravel Passport via Composer**:
+
+   ```bash
+   composer require laravel/passport
+2. **Generate the OAuth clients manually**:
+   ```bash
+   php artisan passport:client
+
+   ```
+
+7. Serve the application:
+
+   ```bash
+   php artisan serve
+   ```
+
+Visit `http://localhost:8000` to start using the NoteKeeper App.
+
+## 📁 Project Structure
+
+```
+├── app/
+│   └── Http/
+│       ├── Controllers/
+│       │   ├── ApiAuthController.php
+│       │   ├── AuthController.php
+│       │   ├── Controller.php
+│       │   ├── NoteController.php
+│       │   └── WebAuthController.php
+│       ├── Middleware/
+│       │   └── PreventBackHistory.php
+│       └── Requests/
+│           ├── LoginRequest.php
+│           ├── RegisterRequest.php
+│           ├── StoreNoteRequest.php
+│           └── UpdateNoteRequest.php
+├── app/Models/
+│   └── Note.php
+├── database/
+│   └── migrations/
+│       └── xxxx_xx_xx_create_notes_table.php
+├── resources/
+│   ├── views/
+│   │   ├── auth/
+│   │   │   ├── login.blade.php
+│   │   │   ├── register.blade.php
+│   │   │   └── verify-otp.blade.php
+│   │   ├── layouts/
+│   │   │   └── app.blade.php
+│   │   └── notes/
+│   │       ├── create.blade.php
+│   │       ├── edit.blade.php
+│   │       ├── index.blade.php
+│   │       ├── show.blade.php
+│   │       ├── user-bookmarked.blade.php
+│   │       └── partials/
+│   │           ├── form.blade.php
+│   │           └── bookmarked.blade.php
+│   ├── css/
+│   └── js/
+├── routes/
+│   └── web.php
+├── public/
+├── config/
+├── bootstrap/
+
+```
+
+## 📌 Note
+
+- Only authenticated users can manage their notes.
+- Notes are private and user-specific.
+- Bookmarked notes can be toggled with a button.
+- Search is performed on both title and content fields.
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## 📄 License
+
+This project is open-sourced under the MIT license.
