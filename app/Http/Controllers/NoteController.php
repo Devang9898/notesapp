@@ -20,7 +20,7 @@ class NoteController extends Controller
             // Apply filters
             $query = $this->applyFilters($request, $query);
 
-            $notes = $query->paginate(5);
+            $notes = $query->paginate(4);
             return view('notes.index', compact('notes'));
 
         } catch (Exception $e) {
