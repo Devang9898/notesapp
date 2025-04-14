@@ -14,7 +14,7 @@ A simple yet powerful NoteKeeper application built with **Laravel 12**. This app
 ## 🏗️ Tech Stack
 
 - **Framework**: Laravel 11 (PHP 8.2)
-- **Authentication**: Laravel Breeze
+- **Authentication**: Laravel Passport
 - **Database**: MySQL
 - **Templating**: Blade
 - **Styling**: Tailwind CSS
