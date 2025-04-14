@@ -1,0 +1,2141 @@
+{{INDEX.BLADE.PHP}}
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-6xl mx-auto py-8 px-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-3xl font-semibold">My Notes</h2>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{{ route('notes.index') }}" class="flex gap-2 flex-wrap items-center">
+            <input type="text" name="search" placeholder="Search notes..." value="{{ request('search') }}"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+
+            <select name="sort"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <option value="">Sort by Latest</option>
+                <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+            </select>
+
+            <button type="submit"
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">🔍 Filter</button>
+
+            <a href="{{ route('notes.index') }}" class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+        </form>
+
+        <a href="{{ route('notes.create') }}"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ New Note</a>
+    </div>
+
+    @if ($notes->count())
+    <!-- Notes Grid -->
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        @foreach ($notes as $note)
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-all duration-300 relative">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold">{{ $note->title }}</h3>
+                @if($note->is_favorite)
+                    <span class="text-yellow-500">&#9733;</span>
+                @else
+                    <span class="text-gray-300">&#9734;</span>
+                @endif
+            </div>
+
+            <p class="text-gray-600 mt-2">
+                {{ \Illuminate\Support\Str::limit(strip_tags($note->content), 100) }}
+            </p>
+
+            <!-- Three Dots Hover Menu -->
+            <div class="relative mt-4">
+                <!-- Three dots icon -->
+                <div class="group inline-block relative cursor-pointer text-gray-500 hover:text-gray-700">
+                    <span class="text-2xl">&#8942;</span> <!-- Vertical three-dots -->
+
+                    <!-- Hidden actions -->
+                    <div
+                        class="absolute right-0 top-6 bg-white border rounded shadow-lg p-2 space-x-2 hidden group-hover:flex z-10">
+
+                        <!-- View Note -->
+                        <a href="{{ route('notes.show', $note) }}"
+                            class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+
+                        <!-- Edit Note -->
+                        <a href="{{ route('notes.edit', $note) }}"
+                            class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                        <!-- Delete Note -->
+                        <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                            onsubmit="return confirm('Delete this note?')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                        </form>
+
+                        <!-- Toggle Favorite -->
+                        <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}"
+                                class="{{ $note->is_favorite ? 'text-yellow-500' : 'text-gray-400' }} hover:text-yellow-600">
+                                {{ $note->is_favorite ? '🔖' : '📌' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @else
+        <p class="text-gray-500">No notes found.</p>
+    @endif
+</div>
+@endsection
+#################WITH GRID VIEW 
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-6xl mx-auto py-8 px-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-3xl font-semibold">My Notes</h2>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{{ route('notes.index') }}" class="flex gap-2 flex-wrap items-center">
+            <input type="text" name="search" placeholder="Search notes..." value="{{ request('search') }}"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+
+            <select name="sort"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <option value="">Sort by Latest</option>
+                <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+            </select>
+
+            <button type="submit"
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">🔍 Filter</button>
+
+            <a href="{{ route('notes.index') }}" class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+        </form>
+
+        <a href="{{ route('notes.create') }}"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ New Note</a>
+    </div>
+
+    @if ($notes->count())
+    <!-- Notes Grid -->
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        @foreach ($notes as $note)
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-all duration-300">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold">{{ $note->title }}</h3>
+                @if($note->is_favorite)
+                    <span class="text-yellow-500">&#9733;</span>
+                @else
+                    <span class="text-gray-300">&#9734;</span>
+                @endif
+            </div>
+
+            <p class="text-gray-600 mt-2">
+                {{ \Illuminate\Support\Str::limit(strip_tags($note->content), 100) }}
+            </p>
+
+            <div class="mt-4 flex gap-4 text-lg items-center">
+                <!-- View Note -->
+                <a href="{{ route('notes.show', $note) }}" class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+
+                <!-- Edit Note -->
+                <a href="{{ route('notes.edit', $note) }}" class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                <!-- Delete Note -->
+                <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                    onsubmit="return confirm('Delete this note?')" class="inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                </form>
+
+                <!-- Toggle Favorite -->
+                <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}"
+                        class="{{ $note->is_favorite ? 'text-yellow-500' : 'text-gray-400' }} hover:text-yellow-600">
+                        {{ $note->is_favorite ? '🔖' : '📌' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @else
+        <p class="text-gray-500">No notes found.</p>
+    @endif
+</div>
+@endsection
+
+##############################
+
+## ✅ Note Management Features Implementation
+
+### ✅ Migration Updates (`database/migrations/xxxx_xx_xx_create_notes_table.php`)
+```php
+Schema::create('notes', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->string('title');
+    $table->text('content');
+    $table->string('tags')->nullable();
+    $table->boolean('is_favorite')->default(false);
+    $table->enum('status', ['active', 'archived'])->default('active');
+    $table->string('color')->nullable();
+    $table->timestamp('reminder_at')->nullable();
+    $table->text('attachments')->nullable();
+    $table->softDeletes();
+    $table->timestamps();
+});
+```
+Run:
+```bash
+php artisan migrate:fresh
+```
+
+---
+
+### ✅ Routes (`routes/web.php`)
+```php
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notes', [NoteController::class, 'index'])->name('notes.index');
+    Route::get('/notes/bookmarks', [NoteController::class, 'bookmarks'])->name('notes.bookmarks');
+    Route::get('/notes/archives', [NoteController::class, 'archives'])->name('notes.archives');
+    Route::get('/notes/trash', [NoteController::class, 'trash'])->name('notes.trash');
+    Route::post('/notes/bulk-action', [NoteController::class, 'bulkAction'])->name('notes.bulkAction');
+    Route::patch('/notes/{note}/restore', [NoteController::class, 'restore'])->name('notes.restore');
+    Route::delete('/notes/{note}/force-delete', [NoteController::class, 'forceDelete'])->name('notes.forceDelete');
+});
+```
+
+---
+
+### ✅ Controller Logic (Add to `NoteController`)
+```php
+public function bookmarks(Request $request) {
+    $notes = Note::where('user_id', Auth::id())
+                ->where('is_favorite', true)
+                ->where('status', '!=', 'archived')
+                ->whereNull('deleted_at')
+                ->get();
+    return view('notes.bookmarks', compact('notes'));
+}
+
+public function archives(Request $request) {
+    $notes = Note::where('user_id', Auth::id())
+                ->where('status', 'archived')
+                ->where('is_favorite', false)
+                ->whereNull('deleted_at')
+                ->get();
+    return view('notes.archives', compact('notes'));
+}
+
+public function trash() {
+    $notes = Note::onlyTrashed()->where('user_id', Auth::id())->get();
+    return view('notes.trash', compact('notes'));
+}
+
+public function restore($id) {
+    $note = Note::onlyTrashed()->findOrFail($id);
+    $note->restore();
+    return redirect()->route('notes.trash')->with('success', 'Note restored.');
+}
+
+public function forceDelete($id) {
+    $note = Note::onlyTrashed()->findOrFail($id);
+    $note->forceDelete();
+    return redirect()->route('notes.trash')->with('success', 'Note permanently deleted.');
+}
+
+public function bulkAction(Request $request) {
+    $request->validate([
+        'action' => 'required|in:delete,restore,archive',
+        'note_ids' => 'required|array'
+    ]);
+
+    $ids = $request->note_ids;
+
+    switch ($request->action) {
+        case 'delete':
+            Note::whereIn('id', $ids)->delete();
+            break;
+        case 'restore':
+            Note::onlyTrashed()->whereIn('id', $ids)->restore();
+            break;
+        case 'archive':
+            Note::whereIn('id', $ids)->update(['status' => 'archived']);
+            break;
+    }
+
+    return back()->with('success', 'Bulk action executed successfully.');
+}
+```
+
+---
+
+### ✅ Blade View Snippets for `bookmarks.blade.php`, `archives.blade.php`, `trash.blade.php`
+All views extend the same layout and include:
+```blade
+@extends('layouts.app')
+@section('content')
+    <form method="POST" action="{{ route('notes.bulkAction') }}">
+        @csrf
+        <select name="action">
+            <option value="delete">Move to Trash</option>
+            <option value="archive">Archive</option>
+            <option value="restore">Restore</option>
+        </select>
+        <button type="submit">Apply</button>
+
+        @foreach ($notes as $note)
+            <div style="border-left: 5px solid {{ $note->color }}; padding: 10px;">
+                <input type="checkbox" name="note_ids[]" value="{{ $note->id }}">
+                <strong>{{ $note->title }}</strong> - {{ $note->tags }}<br>
+                {{ $note->content }}
+            </div>
+        @endforeach
+    </form>
+@endsection
+```
+
+---
+
+### ✅ Optional: Sidebar Filter (include in each view)
+```blade
+<div class="sidebar">
+    <a href="{{ route('notes.index') }}">Active</a>
+    <a href="{{ route('notes.bookmarks') }}">Bookmarked</a>
+    <a href="{{ route('notes.archives') }}">Archived</a>
+    <a href="{{ route('notes.trash') }}">Trash</a>
+</div>
+```
+
+Let me know if you'd like separate views or reusable components for checkboxes, tags, or modals for confirm actions.
+
+######################
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Note;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class NoteController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Note::where('user_id', Auth::id())->whereNull('deleted_at');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->sort === 'name') {
+            $query->orderBy('title');
+        } elseif ($request->sort === 'date_asc') {
+            $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $notes = $query->get();
+
+        return view('notes.index', compact('notes'));
+    }
+
+    public function create()
+    {
+        return view('notes.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required',
+            'tags' => 'nullable|string',
+            'status' => 'required|in:active,archived',
+            'reminder_at' => 'nullable|date',
+            'attachments' => 'nullable|string',
+        ]);
+
+        Note::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'content' => $request->content,
+            'tags' => $request->tags,
+            'status' => $request->status,
+            'reminder_at' => $request->reminder_at,
+            'attachments' => $request->attachments,
+            'is_favorite' => $request->has('is_favorite'),
+        ]);
+
+        return redirect()->route('notes.index')->with('success', 'Note created successfully.');
+    }
+
+    public function show(Note $note)
+    {
+        $this->authorizeNote($note);
+        return view('notes.show', compact('note'));
+    }
+
+    public function edit(Note $note)
+    {
+        $this->authorizeNote($note);
+        return view('notes.edit', compact('note'));
+    }
+
+    public function update(Request $request, Note $note)
+    {
+        $this->authorizeNote($note);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required',
+            'tags' => 'nullable|string',
+            'status' => 'required|in:active,archived',
+            'reminder_at' => 'nullable|date',
+            'attachments' => 'nullable|string',
+        ]);
+
+        $note->update([
+            'title' => $request->title,
+            'content' => $request->content,
+            'tags' => $request->tags,
+            'status' => $request->status,
+            'reminder_at' => $request->reminder_at,
+            'attachments' => $request->attachments,
+            'is_favorite' => $request->has('is_favorite'),
+        ]);
+
+        return redirect()->route('notes.index')->with('success', 'Note updated successfully.');
+    }
+
+    public function destroy(Note $note)
+    {
+        $this->authorizeNote($note);
+        $note->delete();
+
+        return redirect()->route('notes.index')->with('success', 'Note moved to trash.');
+    }
+
+    public function bookmarks()
+    {
+        $notes = Note::where('user_id', Auth::id())
+            ->where('is_favorite', true)
+            ->whereNull('deleted_at')
+            ->get();
+
+        return view('notes.bookmarks', compact('notes'));
+    }
+
+    public function archives()
+    {
+        $notes = Note::where('user_id', Auth::id())
+            ->where('status', 'archived')
+            ->whereNull('deleted_at')
+            ->get();
+
+        return view('notes.archives', compact('notes'));
+    }
+
+    public function trash()
+    {
+        $notes = Note::onlyTrashed()->where('user_id', Auth::id())->get();
+        return view('notes.trash', compact('notes'));
+    }
+
+    public function restore($id)
+    {
+        $note = Note::onlyTrashed()->where('user_id', Auth::id())->findOrFail($id);
+        $note->restore();
+
+        return redirect()->route('notes.trash')->with('success', 'Note restored successfully.');
+    }
+
+    public function forceDelete($id)
+    {
+        $note = Note::onlyTrashed()->where('user_id', Auth::id())->findOrFail($id);
+        $note->forceDelete();
+
+        return redirect()->route('notes.trash')->with('success', 'Note permanently deleted.');
+    }
+
+    public function toggleFavorite(Note $note)
+    {
+        $this->authorizeNote($note);
+        $note->is_favorite = !$note->is_favorite;
+        $note->save();
+
+        return redirect()->back()->with('success', 'Bookmark updated.');
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'note_ids' => 'required|array',
+            'action' => 'required|string|in:delete,restore,force-delete',
+        ]);
+
+        $notes = Note::withTrashed()->whereIn('id', $request->note_ids)->where('user_id', Auth::id());
+
+        switch ($request->action) {
+            case 'delete':
+                $notes->delete();
+                return back()->with('success', 'Selected notes moved to trash.');
+            case 'restore':
+                $notes->restore();
+                return back()->with('success', 'Selected notes restored.');
+            case 'force-delete':
+                $notes->forceDelete();
+                return back()->with('success', 'Selected notes permanently deleted.');
+        }
+
+        return back()->with('error', 'Invalid action.');
+    }
+
+    private function authorizeNote(Note $note)
+    {
+        if ($note->user_id !== Auth::id()) {
+            abort(403);
+        }
+    }
+}
+
+
+
+///////////original controller 
+// namespace App\Http\Controllers;
+
+// use App\Models\Note;
+// use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\Auth;
+
+// class NoteController extends Controller
+// {
+//     public function index(Request $request)
+//     {
+//         $query = Note::where('user_id', Auth::id());
+
+//         // Search
+//         if ($request->filled('search')) {
+//             $search = $request->input('search');
+//             $query->where(function ($q) use ($search) {
+//                 $q->where('title', 'like', "%{$search}%")
+//                   ->orWhere('content', 'like', "%{$search}%");
+//             });
+//         }
+
+//         // Sort
+//         if ($request->input('sort') === 'name') {
+//             $query->orderBy('title');
+//         } elseif ($request->input('sort') === 'date_asc') {
+//             $query->orderBy('created_at', 'asc');
+//         } else {
+//             $query->orderBy('created_at', 'desc'); // Default: latest first
+//         }
+
+//         $notes = $query->get();
+
+//         return view('notes.index', compact('notes'));
+//     }
+
+//     public function create()
+//     {
+//         return view('notes.create');
+//     }
+
+//     public function store(Request $request)
+//     {
+//         $request->validate([
+//             'title' => 'required|string|max:255',
+//             'content' => 'required',
+//             'tags' => 'nullable|string',
+//             'is_favorite' => 'nullable|boolean',
+//             'status' => 'required|in:active,archived',
+//             'reminder_at' => 'nullable|date',
+//             'attachments' => 'nullable|string',
+//         ]);
+
+//         Note::create([
+//             'user_id' => Auth::id(),
+//             'title' => $request->title,
+//             'content' => $request->content,
+//             'tags' => $request->tags,
+//             'is_favorite' => $request->has('is_favorite'),
+//             'status' => $request->status,
+//             'reminder_at' => $request->reminder_at,
+//             'attachments' => $request->attachments,
+//         ]);
+
+//         return redirect()->route('notes.index')->with('success', 'Note created successfully.');
+//     }
+
+//     public function show(Note $note)
+//     {
+//         $this->authorizeNote($note);
+//         return view('notes.show', compact('note'));
+//     }
+
+//     public function edit(Note $note)
+//     {
+//         $this->authorizeNote($note);
+//         return view('notes.edit', compact('note'));
+//     }
+
+//     public function update(Request $request, Note $note)
+//     {
+//         $this->authorizeNote($note);
+
+//         $request->validate([
+//             'title' => 'required|string|max:255',
+//             'content' => 'required',
+//             'tags' => 'nullable|string',
+//             'is_favorite' => 'nullable|boolean',
+//             'status' => 'required|in:active,archived',
+//             'reminder_at' => 'nullable|date',
+//             'attachments' => 'nullable|string',
+//         ]);
+
+//         $note->update([
+//             'title' => $request->title,
+//             'content' => $request->content,
+//             'tags' => $request->tags,
+//             'is_favorite' => $request->has('is_favorite'),
+//             'status' => $request->status,
+//             'reminder_at' => $request->reminder_at,
+//             'attachments' => $request->attachments,
+//         ]);
+
+//         return redirect()->route('notes.index')->with('success', 'Note updated successfully.');
+//     }
+
+//     public function destroy(Note $note)
+//     {
+//         $this->authorizeNote($note);
+//         $note->delete();
+
+//         return redirect()->route('notes.index')->with('success', 'Note deleted successfully.');
+//     }
+
+//     public function toggleFavorite(Note $note)
+//     {
+//         $this->authorizeNote($note);
+
+//         $note->is_favorite = !$note->is_favorite;
+//         $note->save();
+
+//         return redirect()->route('notes.index')->with('success', 'Bookmark status updated.');
+//     }
+
+//     private function authorizeNote(Note $note)
+//     {
+//         if ($note->user_id !== Auth::id()) {
+//             abort(403);
+//         }
+//     }
+// }
+//////////////////////////////////////////////
+advance note controller  
+
+<?php
+
+
+namespace App\Http\Controllers;
+
+use App\Models\Note;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class NoteController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Note::where('user_id', Auth::id())->whereNull('deleted_at');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->sort === 'name') {
+            $query->orderBy('title');
+        } elseif ($request->sort === 'date_asc') {
+            $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $notes = $query->get();
+
+        return view('notes.index', compact('notes'));
+    }
+
+    public function create()
+    {
+        return view('notes.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required',
+            'tags' => 'nullable|string',
+            'status' => 'required|in:active,archived',
+            'reminder_at' => 'nullable|date',
+            'attachments' => 'nullable|string',
+        ]);
+
+        Note::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'content' => $request->content,
+            'tags' => $request->tags,
+            'status' => $request->status,
+            'reminder_at' => $request->reminder_at,
+            'attachments' => $request->attachments,
+            'is_favorite' => $request->has('is_favorite'),
+        ]);
+
+        return redirect()->route('notes.index')->with('success', 'Note created successfully.');
+    }
+
+    public function show(Note $note)
+    {
+        $this->authorizeNote($note);
+        return view('notes.show', compact('note'));
+    }
+
+    public function edit(Note $note)
+    {
+        $this->authorizeNote($note);
+        return view('notes.edit', compact('note'));
+    }
+
+    public function update(Request $request, Note $note)
+    {
+        $this->authorizeNote($note);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required',
+            'tags' => 'nullable|string',
+            'status' => 'required|in:active,archived',
+            'reminder_at' => 'nullable|date',
+            'attachments' => 'nullable|string',
+        ]);
+
+        $note->update([
+            'title' => $request->title,
+            'content' => $request->content,
+            'tags' => $request->tags,
+            'status' => $request->status,
+            'reminder_at' => $request->reminder_at,
+            'attachments' => $request->attachments,
+            'is_favorite' => $request->has('is_favorite'),
+        ]);
+
+        return redirect()->route('notes.index')->with('success', 'Note updated successfully.');
+    }
+
+    public function destroy(Note $note)
+    {
+        $this->authorizeNote($note);
+        $note->delete();
+
+        return redirect()->route('notes.index')->with('success', 'Note moved to trash.');
+    }
+
+    public function bookmarks()
+    {
+        $notes = Note::where('user_id', Auth::id())
+            ->where('is_favorite', true)
+            ->whereNull('deleted_at')
+            ->get();
+
+        return view('notes.bookmarks', compact('notes'));
+    }
+
+    public function archives()
+    {
+        $notes = Note::where('user_id', Auth::id())
+            ->where('status', 'archived')
+            ->whereNull('deleted_at')
+            ->get();
+
+        return view('notes.archives', compact('notes'));
+    }
+
+    public function trash()
+    {
+        $notes = Note::onlyTrashed()->where('user_id', Auth::id())->get();
+        return view('notes.trash', compact('notes'));
+    }
+
+    public function restore($id)
+    {
+        $note = Note::onlyTrashed()->where('user_id', Auth::id())->findOrFail($id);
+        $note->restore();
+
+        return redirect()->route('notes.trash')->with('success', 'Note restored successfully.');
+    }
+
+    public function forceDelete($id)
+    {
+        $note = Note::onlyTrashed()->where('user_id', Auth::id())->findOrFail($id);
+        $note->forceDelete();
+
+        return redirect()->route('notes.trash')->with('success', 'Note permanently deleted.');
+    }
+
+    public function toggleFavorite(Note $note)
+    {
+        $this->authorizeNote($note);
+        $note->is_favorite = !$note->is_favorite;
+        $note->save();
+
+        return redirect()->back()->with('success', 'Bookmark updated.');
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'note_ids' => 'required|array',
+            'action' => 'required|string|in:delete,restore,force-delete',
+        ]);
+
+        $notes = Note::withTrashed()->whereIn('id', $request->note_ids)->where('user_id', Auth::id());
+
+        switch ($request->action) {
+            case 'delete':
+                $notes->delete();
+                return back()->with('success', 'Selected notes moved to trash.');
+            case 'restore':
+                $notes->restore();
+                return back()->with('success', 'Selected notes restored.');
+            case 'force-delete':
+                $notes->forceDelete();
+                return back()->with('success', 'Selected notes permanently deleted.');
+        }
+
+        return back()->with('error', 'Invalid action.');
+    }
+
+    private function authorizeNote(Note $note)
+    {
+        if ($note->user_id !== Auth::id()) {
+            abort(403);
+        }
+    }
+}
+
+
+///////////////////////route 
+<?php
+
+use App\Http\Controllers\WebAuthController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Middleware\PreventBackHistory;
+use App\Http\Controllers\NoteController;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Web Register/Login
+Route::get('/register', [WebAuthController::class, 'showRegisterForm'])->name('register.form');
+Route::post('/register', [WebAuthController::class, 'register'])->name('register');
+
+Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login.form');
+Route::post('/login', [WebAuthController::class, 'login'])->name('login');
+
+// Protected Routes with PreventBackHistory
+Route::middleware(['auth', PreventBackHistory::class])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        return view('dashboard', compact('user'));
+    })->name('dashboard');
+
+    Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+});
+
+Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard', ['user' => auth()->user()]);
+    })->name('dashboard');
+
+    // Note CRUD Routes
+    Route::resource('notes', NoteController::class);
+
+    // Logout
+    Route::post('/logout', [\App\Http\Controllers\WebAuthController::class, 'logout'])->name('logout');
+});
+
+Route::put('/notes/{note}/toggle-favorite', [NoteController::class, 'toggleFavorite'])->name('notes.toggleFavorite');
+Route::put('/notes/{note}/favorite', [NoteController::class, 'toggleFavorite'])->name('notes.favorite');
+
+//Route::get('/notes/bookmarked', [NoteController::class, 'bookmarked'])->name('notes.bookmarked');
+Route::get('/notes/bookmarked', [NoteController::class, 'bookmarked'])->name('notes.bookmarked');
+
+
+
+///////////////////////
+new webauth 
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Mail\OtpMail; // We'll create this Mailable next
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+
+class WebAuthController extends Controller
+{
+    // Show the login form
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    // Handle login process
+    public function login(LoginRequest $request): RedirectResponse
+    {
+        // First, attempt to authenticate the user with the credentials
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            // Generate OTP and store it in the session
+            $otp = Str::random(6); // 6 character OTP
+            session(['otp' => $otp, 'otp_sent_to' => Auth::user()->email]);
+
+            // Send OTP to user's email
+            Mail::to(Auth::user()->email)->send(new OtpMail($otp));
+
+            // Redirect to OTP verification page
+            return redirect()->route('verify-otp');
+        }
+
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+    }
+
+    // Show OTP verification form
+    public function showOtpForm()
+    {
+        return view('auth.verify-otp');
+    }
+
+    // Handle OTP verification
+    public function verifyOtp(Request $request)
+    {
+        // Validate OTP input
+        $request->validate([
+            'otp' => 'required|numeric|digits:6',
+        ]);
+
+        // Check if the entered OTP matches the stored OTP
+        if ($request->otp == session('otp')) {
+            // OTP is correct, log the user in
+            session()->forget('otp'); // Remove OTP from session
+
+            return redirect()->route('notes.index');
+        }
+
+        return redirect()->back()->withErrors(['otp' => 'Invalid OTP']);
+    }
+
+    // Logout user
+    public function logout(): RedirectResponse
+    {
+        Auth::logout();
+        return redirect('/')->with('status', 'You have been logged out.');
+    }
+}
+///////////////////
+old webauth 
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+
+class WebAuthController extends Controller
+{
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    public function register(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+        ]);
+
+        return redirect('/login')->with('status', 'Registration successful. Please login.');
+    }
+
+    public function login(Request $request): RedirectResponse
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            return redirect()->route('notes.index');
+        }
+
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+    }
+
+
+    public function logout(): RedirectResponse
+    {
+        Auth::logout();
+        return redirect('/')->with('status', 'You have been logged out.');
+    }
+    public function toggleFavorite(Note $note)
+    {
+        $this->authorizeNote($note);
+
+        $note->is_favorite = !$note->is_favorite;
+        $note->save();
+
+        return redirect()->route('notes.index')->with('success', 'Bookmark status updated.');
+    }
+
+}
+
+
+///web auth without request 
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+
+class WebAuthController extends Controller
+{
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    public function register(RegisterRequest $request): RedirectResponse
+    {
+        // The validation is now handled by RegisterRequest
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+        ]);
+
+        return redirect('/login')->with('status', 'Registration successful. Please login.');
+    }
+
+    public function login(LoginRequest $request): RedirectResponse
+    {
+        // The validation is now handled by LoginRequest
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            return redirect()->route('notes.index');
+        }
+
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+    }
+
+    public function logout(): RedirectResponse
+    {
+        Auth::logout();
+        return redirect('/')->with('status', 'You have been logged out.');
+    }
+}
+
+
+//////////
+///////email otp one 
+
+<?php 
+namespace App\Http\Controllers;
+
+use App\Http\Requests\LoginRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail;
+
+class WebAuthController extends Controller
+{
+    // Show Register Form
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    // Show Login Form
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    // Handle User Registration
+    public function register(RegisterRequest $request)
+    {
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+        ]);
+
+        return redirect('/login')->with('status', 'Registration successful. Please login.');
+    }
+
+    // Handle User Login (First Step)
+    public function login(LoginRequest $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        // Attempt login with provided credentials
+        if (Auth::attempt($credentials)) {
+            // Get the registered user's email from the database
+            $user = Auth::user();
+
+            // Generate OTP
+            $otp = rand(100000, 999999);
+
+            // Store OTP in session
+            session(['otp' => $otp, 'otp_sent_to' => $user->email]);
+
+            // Send OTP to the user's registered email
+            Mail::to($user->email)->send(new OtpMail($otp));
+
+            // Redirect to OTP verification page
+            return redirect()->route('verify-otp');
+        }
+
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+    }
+
+    // Show OTP Verification Form
+    public function showOtpForm()
+    {
+        return view('auth.verify-otp');
+    }
+
+    // Verify OTP and Login the User
+    public function verifyOtp(Request $request)
+    {
+        // Validate OTP input
+        $request->validate([
+            'otp' => 'required|numeric',
+        ]);
+
+        // Check if OTP matches
+        if ($request->otp == session('otp')) {
+            // OTP is correct, log the user in
+            return redirect()->route('notes.index');
+        }
+
+        // If OTP doesn't match, show error message
+        return back()->withErrors(['otp' => 'Invalid OTP']);
+    }
+
+    // Handle User Logout
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/')->with('status', 'You have been logged out.');
+    }
+}
+
+
+
+//////////////check welcome page test 
+@extends('layouts.app')
+
+@section('content')
+<div class="min-h-screen flex">
+    <!-- Left Side - Welcome Message -->
+    <div class="w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center px-10">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-4">Welcome to NoteKeeper</h1>
+            <p class="text-lg opacity-90">Keep your notes safe, organized, and accessible anytime, anywhere.</p>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="w-1/2 flex items-center justify-center bg-white">
+        <div class="w-full max-w-md p-8 shadow-lg rounded-lg border">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Login to your account</h2>
+
+            <!-- Regular Login Form -->
+            <form method="POST" action="{{ route('verify-otp') }}">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="email" class="block mb-1 text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="you@example.com" required>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block mb-1 text-gray-700">Password</label>
+                    <input type="password" name="password" id="password" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-300">
+                    Send OTP
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-gray-600">Don't have an account?
+                <a href="{{ route('register.form') }}" class="text-blue-600 hover:underline">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+@endsection
+
+
+
+
+
+//////////////////////
+complete welcome 
+@extends('layouts.app')
+
+@section('content')
+<div class="min-h-screen flex">
+    <!-- Left Side - Welcome Message -->
+    <div class="w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center px-10">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-4">Welcome to NoteKeeper</h1>
+            <p class="text-lg opacity-90">Keep your notes safe, organized, and accessible anytime, anywhere.</p>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="w-1/2 flex items-center justify-center bg-white">
+        <div class="w-full max-w-md p-8 shadow-lg rounded-lg border">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Login to your account</h2>
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="email" class="block mb-1 text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="you@example.com" required>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block mb-1 text-gray-700">Password</label>
+                    <input type="password" name="password" id="password" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-300">
+                    Login
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-gray-600">Don't have an account?
+                <a href="{{ route('register.form') }}" class="text-blue-600 hover:underline">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+@endsection
+
+///////////////
+
+one code for bookmark 
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-6xl mx-auto py-8">
+
+    <!-- Bookmarked Notes -->
+    @php
+        $bookmarkedNotes = \App\Models\Note::where('user_id', Auth::id())
+            ->where('is_favorite', true)
+            ->latest()
+            ->take(5)
+            ->get();
+    @endphp
+
+    <div class="mb-8">
+        <h3 class="font-semibold text-lg">⭐ Bookmarked Notes</h3>
+        <ul class="mt-2 space-y-1">
+            @forelse ($bookmarkedNotes as $note)
+                <li>
+                    <a href="{{ route('notes.show', $note->id) }}" class="text-blue-600 hover:underline">
+                        {{ \Illuminate\Support\Str::limit($note->title, 30) }}
+                    </a>
+                </li>
+            @empty
+                <li class="text-gray-500 text-sm">No bookmarks yet.</li>
+            @endforelse
+        </ul>
+    </div>
+
+    <!-- Page Header and Controls -->
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-3xl font-semibold">My Notes</h2>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{{ route('notes.index') }}" class="flex gap-2 flex-wrap items-center">
+            <input type="text" name="search" placeholder="Search notes..." value="{{ request('search') }}"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+
+            <select name="sort"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <option value="">Sort by Latest</option>
+                <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+            </select>
+
+            <button type="submit"
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">🔍 Filter</button>
+
+            <a href="{{ route('notes.index') }}" class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+        </form>
+
+        <a href="{{ route('notes.create') }}"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ New Note</a>
+
+        <a href="{{ route('notes.bookmarked') }}">View Bookmarked Notes</a>
+    </div>
+
+    <!-- Notes List -->
+    @forelse ($notes as $note)
+        <div class="bg-white p-6 rounded shadow mb-4">
+            <h3 class="text-xl font-bold flex flex-wrap items-center gap-4 justify-between">
+                <span class="flex items-center gap-3">
+                    {{ $note->title }}
+
+                    <!-- Favorite Star beside title -->
+                    @if($note->is_favorite)
+                        <span class="text-yellow-500">&#9733;</span>
+                    @else
+                        <span class="text-gray-300">&#9734;</span>
+                    @endif
+                </span>
+
+                <!-- Action Icons beside title -->
+                <span class="flex items-center gap-3 text-lg">
+                    <!-- View -->
+                    <a href="{{ route('notes.show', $note) }}" class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+
+                    <!-- Edit -->
+                    <a href="{{ route('notes.edit', $note) }}" class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                    <!-- Delete -->
+                    <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                        onsubmit="return confirm('Delete this note?')" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                    </form>
+
+                    <!-- Bookmark -->
+                    <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}"
+                            class="{{ $note->is_favorite ? 'text-yellow-500' : 'text-gray-400' }} hover:text-yellow-600">
+                            {{ $note->is_favorite ? '🔖' : '📌' }}
+                        </button>
+                    </form>
+                </span>
+            </h3>
+
+            <p class="text-gray-600 mt-2 whitespace-pre-line">
+                {{ \Illuminate\Support\Str::limit($note->content, 100) }}
+            </p>
+        </div>
+    @empty
+        <p class="text-gray-500">No notes found.</p>
+    @endforelse
+
+    <!-- Pagination Links -->
+    <div class="mt-6">
+        {{ $notes->appends(request()->query())->links() }}
+    </div>
+
+</div>
+@endsection
+
+
+another code for bookmark index 
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-6xl mx-auto py-8">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-3xl font-semibold">My Notes</h2>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{{ route('notes.index') }}" class="flex gap-2 flex-wrap items-center">
+            <input type="text" name="search" placeholder="Search notes..." value="{{ request('search') }}"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+
+            <select name="sort"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <option value="">Sort by Latest</option>
+                <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+            </select>
+
+            <button type="submit"
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">🔍 Filter</button>
+
+            <a href="{{ route('notes.index') }}" class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+        </form>
+
+        <a href="{{ route('notes.create') }}"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ New Note</a>
+
+        <a href="{{ route('notes.bookmarked') }}">View Bookmarked Notes</a>
+    </div>
+
+    <!-- ✅ Bookmarked Notes Section -->
+    @php
+        $bookmarkedNotes = \App\Models\Note::where('user_id', Auth::id())
+            ->where('is_favorite', true)
+            ->latest()
+            ->take(5)
+            ->get();
+    @endphp
+
+    <div class="bg-gray-100 p-4 rounded-md shadow mb-6">
+        <h3 class="font-semibold text-lg mb-2">⭐ Bookmarked Notes</h3>
+        <ul class="list-disc list-inside space-y-1">
+            @forelse ($bookmarkedNotes as $note)
+                <li>
+                    <a href="{{ route('notes.show', $note->id) }}" class="text-blue-600 hover:underline">
+                        {{ \Illuminate\Support\Str::limit($note->title, 30) }}
+                    </a>
+                </li>
+            @empty
+                <li class="text-gray-500 text-sm">No bookmarks yet.</li>
+            @endforelse
+        </ul>
+    </div>
+    <!-- ✅ End Bookmarked Notes Section -->
+
+    <!-- Notes List -->
+    @forelse ($notes as $note)
+        <div class="bg-white p-6 rounded shadow mb-4">
+            <h3 class="text-xl font-bold flex flex-wrap items-center gap-4 justify-between">
+                <span class="flex items-center gap-3">
+                    {{ $note->title }}
+
+                    <!-- Favorite Star beside title -->
+                    @if($note->is_favorite)
+                        <span class="text-yellow-500">&#9733;</span>
+                    @else
+                        <span class="text-gray-300">&#9734;</span>
+                    @endif
+                </span>
+
+                <!-- Action Icons beside title -->
+                <span class="flex items-center gap-3 text-lg">
+                    <!-- View -->
+                    <a href="{{ route('notes.show', $note) }}" class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+
+                    <!-- Edit -->
+                    <a href="{{ route('notes.edit', $note) }}" class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                    <!-- Delete -->
+                    <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                        onsubmit="return confirm('Delete this note?')" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                    </form>
+
+                    <!-- Bookmark -->
+                    <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}"
+                            class="{{ $note->is_favorite ? 'text-yellow-500' : 'text-gray-400' }} hover:text-yellow-600">
+                            {{ $note->is_favorite ? '🔖' : '📌' }}
+                        </button>
+                    </form>
+                </span>
+            </h3>
+
+            <p class="text-gray-600 mt-2 whitespace-pre-line">
+                {{ \Illuminate\Support\Str::limit($note->content, 100) }}
+            </p>
+        </div>
+    @empty
+        <p class="text-gray-500">No notes found.</p>
+    @endforelse
+
+    <!-- Pagination Links -->
+    <div class="mt-6">
+        {{ $notes->appends(request()->query())->links() }}
+    </div>
+
+</div>
+@endsection
+
+
+
+///////////original without bookmark 
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-6xl mx-auto py-8">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <h2 class="text-3xl font-semibold">My Notes</h2>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{{ route('notes.index') }}" class="flex gap-2 flex-wrap items-center">
+            <input type="text" name="search" placeholder="Search notes..." value="{{ request('search') }}"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+
+            <select name="sort"
+                class="border border-gray-300 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <option value="">Sort by Latest</option>
+                <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+            </select>
+
+            <button type="submit"
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">🔍 Filter</button>
+
+            <a href="{{ route('notes.index') }}" class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+        </form>
+
+        <a href="{{ route('notes.create') }}"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+ New Note</a>
+
+        <a href="{{ route('notes.bookmarked') }}">View Bookmarked Notes</a>
+
+    </div>
+
+    <!-- Notes List -->
+    @forelse ($notes as $note)
+        <div class="bg-white p-6 rounded shadow mb-4">
+            <h3 class="text-xl font-bold flex flex-wrap items-center gap-4 justify-between">
+                <span class="flex items-center gap-3">
+                    {{ $note->title }}
+
+                    <!-- Favorite Star beside title -->
+                    @if($note->is_favorite)
+                        <span class="text-yellow-500">&#9733;</span>
+                    @else
+                        <span class="text-gray-300">&#9734;</span>
+                    @endif
+                </span>
+
+                <!-- Action Icons beside title -->
+                <span class="flex items-center gap-3 text-lg">
+                    <!-- View -->
+                    <a href="{{ route('notes.show', $note) }}" class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+
+                    <!-- Edit -->
+                    <a href="{{ route('notes.edit', $note) }}" class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                    <!-- Delete -->
+                    <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                        onsubmit="return confirm('Delete this note?')" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                    </form>
+
+                    <!-- Bookmark -->
+                    <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}"
+                            class="{{ $note->is_favorite ? 'text-yellow-500' : 'text-gray-400' }} hover:text-yellow-600">
+                            {{ $note->is_favorite ? '🔖' : '📌' }}
+                        </button>
+                    </form>
+                </span>
+            </h3>
+
+            <p class="text-gray-600 mt-2">
+                {{ \Illuminate\Support\Str::limit(strip_tags($note->content), 100) }}
+            </p>
+        </div>
+    @empty
+        <p class="text-gray-500">No notes found.</p>
+    @endforelse
+
+    <!-- Pagination Links -->
+    <div class="mt-6">
+        {{ $notes->appends(request()->query())->links() }}
+    </div>
+
+</div>
+@endsection
+route stored 
+<?php
+
+use App\Http\Controllers\WebAuthController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Middleware\PreventBackHistory;
+use App\Http\Controllers\NoteController;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Web Register/Login
+Route::get('/register', [WebAuthController::class, 'showRegisterForm'])->name('register.form');
+Route::post('/register', [WebAuthController::class, 'register'])->name('register');
+
+Route::get('/login', [WebAuthController::class, 'showLoginForm'])->name('login.form');
+Route::post('/login', [WebAuthController::class, 'login'])->name('login');
+
+// Protected Routes with PreventBackHistory middleware
+Route::middleware(['auth', PreventBackHistory::class])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        return view('dashboard', compact('user'));
+    })->name('dashboard');
+
+    // Note CRUD Routes
+    Route::resource('notes', NoteController::class);
+
+    // Route to toggle the favorite status of a note
+    Route::put('/notes/{note}/toggle-favorite', [NoteController::class, 'toggleFavorite'])->name('notes.toggleFavorite');
+
+    // Route for bookmarked notes
+    Route::get('/notes/bookmarked', [NoteController::class, 'bookmarked'])->name('notes.bookmarked');
+
+    // Logout Route
+    Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+});
+Route::get('/verify-otp', [WebAuthController::class, 'showOtpForm'])->name('verify-otp.form');
+Route::post('/verify-otp', [WebAuthController::class, 'verifyOtp'])->name('verify-otp');
+Route::put('/notes/{note}/toggle-pin', [NoteController::class, 'togglePin'])->name('notes.togglePin');
+Route::get('/my-bookmarks', [NoteController::class, 'userBookmarkedNotes'])->name('notes.user-bookmarked');
+//Route::get('/notes/bookmarked', [NoteController::class, 'bookmarked'])->name('notes.bookmarked');
+
+   public function bookmarked()
+    {
+        $bookmarkedNotes = \App\Models\Note::where('user_id', Auth::id())
+            ->where('is_favorite', true)
+            ->latest()
+            ->paginate(10); // Paginate if needed
+
+        return view('notes.bookmarked', compact('bookmarkedNotes'));
+    }
+
+     // public function userBookmarkedNotes()
+    // {
+    //     $bookmarkedNotes = Note::where('user_id', Auth::id())
+    //         ->where('is_favorite', true)
+    //         ->latest()
+    //         ->paginate(10); // optional pagination
+
+    //     return view('notes.user-bookmarked', compact('bookmarkedNotes'));
+    // }
+
+     // public function bookmarked()
+    // {
+    //     $bookmarkedNotes = Note::where('user_id', Auth::id())
+    //         ->where('is_favorite', true)
+    //         ->get();
+
+    //     return view('notes.bookmarked', compact('bookmarkedNotes'));
+    // }
+
+
+    ///////welcome file image one 
+    @extends('layouts.app')
+
+@section('content')
+<div class="min-h-screen flex">
+    <!-- Left Side - Welcome Message with Image -->
+    <div class="w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center px-10">
+        <div class="text-center">
+            <!-- Resized Image to 50x50 -->
+            {{--<img 
+                src="https://play-lh.googleusercontent.com/SH3KQ_3vyhyl0hJzaNlE9pU1RYisXa0nKrF5gVFlnpzqChjY8-yZbZBP4ElfEtG1Fwo" 
+                alt="Note Illustration" 
+                class="mx-auto mb-6 rounded-lg shadow-lg" 
+                width="50" height="50">--}}
+
+            <h1 class="text-4xl font-bold mb-4">Welcome to NoteKeeper</h1>
+            <p class="text-lg opacity-90">Keep your notes safe, organized, and accessible anytime, anywhere.</p>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="w-1/2 flex items-center justify-center bg-white">
+        <div class="w-full max-w-md p-8 shadow-lg rounded-lg border">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Login to your account</h2>
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="email" class="block mb-1 text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="you@example.com" required>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block mb-1 text-gray-700">Password</label>
+                    <input type="password" name="password" id="password" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-300">
+                    Login
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-gray-600">Don't have an account?
+                <a href="{{ route('register.form') }}" class="text-blue-600 hover:underline">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+@endsection
+/////this isi alos modified 
+
+@extends('layouts.app')
+
+@section('content')
+<div class="min-h-screen flex">
+    <!-- Left Side - Welcome Message with Image -->
+    <div class="w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center px-10">
+        <div class="text-center">
+            <!-- Add your image here -->
+            <img src="https://play-lh.googleusercontent.com/SH3KQ_3vyhyl0hJzaNlE9pU1RYisXa0nKrF5gVFlnpzqChjY8-yZbZBP4ElfEtG1Fwo" alt="Note Illustration" class="mx-auto mb-6 w-64 h-auto rounded-lg shadow-lg">
+            <!-- Alternatively, use an external image -->
+            {{-- <img src="https://img.icons8.com/ios-filled/100/note.png" alt="Note Icon" class="mx-auto mb-6 w-40 h-auto"> --}}
+
+            <h1 class="text-4xl font-bold mb-4">Welcome to NoteKeeper</h1>
+            <p class="text-lg opacity-90">Keep your notes safe, organized, and accessible anytime, anywhere.</p>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="w-1/2 flex items-center justify-center bg-white">
+        <div class="w-full max-w-md p-8 shadow-lg rounded-lg border">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Login to your account</h2>
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="email" class="block mb-1 text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="you@example.com" required>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block mb-1 text-gray-700">Password</label>
+                    <input type="password" name="password" id="password" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-300">
+                    Login
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-gray-600">Don't have an account?
+                <a href="{{ route('register.form') }}" class="text-blue-600 hover:underline">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+@endsection
+
+
+///////////////////
+original blade view for welcome 
+@extends('layouts.app')
+
+@section('content')
+<div class="min-h-screen flex">
+    <!-- Left Side - Welcome Message -->
+    <div class="w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center px-10">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-4">Welcome to NoteKeeper</h1>
+            <p class="text-lg opacity-90">Keep your notes safe, organized, and accessible anytime, anywhere.</p>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="w-1/2 flex items-center justify-center bg-white">
+        <div class="w-full max-w-md p-8 shadow-lg rounded-lg border">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Login to your account</h2>
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="email" class="block mb-1 text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="you@example.com" required>
+                </div>
+
+                <div class="mb-6">
+                    <label for="password" class="block mb-1 text-gray-700">Password</label>
+                    <input type="password" name="password" id="password" class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-300">
+                    Login
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-gray-600">Don't have an account?
+                <a href="{{ route('register.form') }}" class="text-blue-600 hover:underline">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+@endsection
+/////////////temp working with live search without search
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- 🔍 Live Search -->
+    <div class="relative mb-8">
+        <input type="text" id="noteSearch" placeholder="Search notes..."
+            class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200" />
+        
+        <ul id="autocomplete-results"
+            class="absolute bg-white border border-gray-300 mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto hidden w-full z-50">
+        </ul>
+    </div>
+
+    <!-- Header & Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">📝 My Notes</h2>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="GET" action="{{ route('notes.index') }}" class="flex items-center gap-2">
+
+                <select name="sort"
+                    class="border border-gray-300 px-3 py-1.5 rounded-md shadow-sm focus:ring-2 focus:ring-blue-300">
+                    <option value="">Sort by Latest</option>
+                    <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                    <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+                </select>
+
+                <button type="submit"
+                    class="bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-600 transition">Filter</button>
+
+                <a href="{{ route('notes.index') }}"
+                    class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+            </form>
+
+            <a href="{{ route('notes.create') }}"
+                class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">+ New Note</a>
+
+            <a href="{{ route('notes.bookmarked') }}"
+                class="text-blue-600 hover:underline">⭐ Bookmarked</a>
+        </div>
+    </div>
+
+    <!-- Notes List -->
+    <div class="space-y-4">
+        @forelse ($notes as $note)
+            <div class="bg-white border border-gray-200 p-5 rounded-lg shadow-sm hover:shadow-md transition">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-xl font-semibold text-gray-800">{{ $note->title }}</h3>
+                        @if($note->is_favorite)
+                            <span class="text-yellow-400">&#9733;</span>
+                        @else
+                            <span class="text-gray-300">&#9734;</span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-3 text-xl">
+                        <a href="{{ route('notes.show', $note) }}" class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+                        <a href="{{ route('notes.edit', $note) }}" class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                        <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                            onsubmit="return confirm('Are you sure you want to delete this note?')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                        </form>
+
+                        <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="{{ $note->is_favorite ? 'text-yellow-400' : 'text-gray-400' }} hover:text-yellow-500" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}">
+                                {{ $note->is_favorite ? '🔖' : '📌' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="text-center text-gray-500 text-lg mt-12">No notes found. Try adding a new one! ✨</div>
+        @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8">
+        {{ $notes->appends(request()->query())->links() }}
+    </div>
+</div>
+
+<!-- Live Search Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('noteSearch');
+        const resultsList = document.getElementById('autocomplete-results');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                resultsList.classList.add('hidden');
+                resultsList.innerHTML = '';
+                return;
+            }
+
+            fetch(`{{ route('notes.search') }}?query=${encodeURIComponent(query) }`)
+                .then(res => res.json())
+                .then(data => {
+                    resultsList.innerHTML = '';
+                    if (data.length === 0) {
+                        resultsList.innerHTML = '<li class="px-4 py-2 text-gray-500">No matching notes found</li>';
+                    } else {
+                        data.forEach(note => {
+                            const li = document.createElement('li');
+                            li.textContent = note.title;
+                            li.className = 'px-4 py-2 hover:bg-blue-100 cursor-pointer';
+                            li.onclick = () => window.location.href = `/notes/${note.id}`;
+                            resultsList.appendChild(li);
+                        });
+                    }
+
+                    resultsList.classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Live search failed:', err);
+                    resultsList.classList.add('hidden');
+                });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+                resultsList.classList.add('hidden');
+            }
+        });
+    });
+</script>
+@endsection
+
+
+
+/////////////////////
+
+
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- 🔍 Live Search -->
+    <div class="relative mb-8">
+        <input type="text" id="noteSearch" placeholder="Search notes..."
+            class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200" />
+        
+        <ul id="autocomplete-results"
+            class="absolute bg-white border border-gray-300 mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto hidden w-full z-50">
+        </ul>
+    </div>
+
+    <!-- Header & Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">📝 My Notes</h2>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <form method="GET" action="{{ route('notes.index') }}" class="flex items-center gap-2">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..."
+                    class="border border-gray-300 px-3 py-1.5 rounded-md shadow-sm focus:ring-2 focus:ring-blue-300" />
+
+                <select name="sort"
+                    class="border border-gray-300 px-3 py-1.5 rounded-md shadow-sm focus:ring-2 focus:ring-blue-300">
+                    <option value="">Sort by Latest</option>
+                    <option value="date_asc" {{ request('sort') === 'date_asc' ? 'selected' : '' }}>Oldest First</option>
+                    <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Title A-Z</option>
+                </select>
+
+                <button type="submit"
+                    class="bg-blue-500 text-white px-3 py-1.5 rounded-md hover:bg-blue-600 transition">Filter</button>
+
+                <a href="{{ route('notes.index') }}"
+                    class="text-sm text-gray-500 hover:underline ml-2">Reset</a>
+            </form>
+
+            <a href="{{ route('notes.create') }}"
+                class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">+ New Note</a>
+
+            <a href="{{ route('notes.bookmarked') }}"
+                class="text-blue-600 hover:underline">⭐ Bookmarked</a>
+        </div>
+    </div>
+
+    <!-- Notes List -->
+    <div class="space-y-4">
+        @forelse ($notes as $note)
+            <div class="bg-white border border-gray-200 p-5 rounded-lg shadow-sm hover:shadow-md transition">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-xl font-semibold text-gray-800">{{ $note->title }}</h3>
+                        @if($note->is_favorite)
+                            <span class="text-yellow-400">&#9733;</span>
+                        @else
+                            <span class="text-gray-300">&#9734;</span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center gap-3 text-xl">
+                        <!-- View -->
+                        <a href="{{ route('notes.show', $note) }}" class="text-blue-500 hover:text-blue-700" title="View">🔍</a>
+
+                        <!-- Edit -->
+                        <a href="{{ route('notes.edit', $note) }}" class="text-green-500 hover:text-green-700" title="Edit">✏️</a>
+
+                        <!-- Delete -->
+                        <form action="{{ route('notes.destroy', $note) }}" method="POST"
+                            onsubmit="return confirm('Are you sure you want to delete this note?')" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700" title="Delete">🗑️</button>
+                        </form>
+
+                        <!-- Bookmark -->
+                        <form action="{{ route('notes.toggleFavorite', $note) }}" method="POST" class="inline">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="{{ $note->is_favorite ? 'text-yellow-400' : 'text-gray-400' }} hover:text-yellow-500" title="{{ $note->is_favorite ? 'Unbookmark' : 'Bookmark' }}">
+                                {{ $note->is_favorite ? '🔖' : '📌' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {{--<p class="text-gray-600 mt-2 line-clamp-2">{{ Str::limit($note->content, 120) }}</p>--}}
+            </div>
+        @empty
+            <div class="text-center text-gray-500 text-lg mt-12">No notes found. Try adding a new one! ✨</div>
+        @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8">
+        {{ $notes->appends(request()->query())->links() }}
+    </div>
+</div>
+
+<!-- Live Search Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('noteSearch');
+        const resultsList = document.getElementById('autocomplete-results');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                resultsList.classList.add('hidden');
+                resultsList.innerHTML = '';
+                return;
+            }
+
+            fetch(`{{ route('notes.search') }}?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    resultsList.innerHTML = '';
+                    if (data.length === 0) {
+                        resultsList.innerHTML = '<li class="px-4 py-2 text-gray-500">No matching notes found</li>';
+                    } else {
+                        data.forEach(note => {
+                            const li = document.createElement('li');
+                            li.textContent = note.title;
+                            li.className = 'px-4 py-2 hover:bg-blue-100 cursor-pointer';
+                            li.onclick = () => window.location.href = `/notes/${note.id}`;
+                            resultsList.appendChild(li);
+                        });
+                    }
+
+                    resultsList.classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Live search failed:', err);
+                    resultsList.classList.add('hidden');
+                });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+                resultsList.classList.add('hidden');
+            }
+        });
+    });
+</script>
+@endsection
+
+
+///above is original 
+
+
